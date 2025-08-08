@@ -1,0 +1,10 @@
+# Rust
+/target
+/Cargo.lock
+
+# Go
+/bin
+*.exe
+
+# Env
+.env
