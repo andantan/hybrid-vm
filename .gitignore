@@ -1,10 +1,17 @@
 # Rust
-/target
-/Cargo.lock
+*/target
+*/Cargo.lock
 
 # Go
 /bin
 *.exe
+*.test
+*.prof
 
 # Env
 .env
+
+# OS & IDE
+.DS_Store
+.idea/
+*.swp
