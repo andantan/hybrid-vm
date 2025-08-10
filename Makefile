@@ -1,23 +1,22 @@
 ifeq ($(OS),Windows_NT)
     CLEAR_COMMAND = @cls
     COPY_COMMAND = copy
-    MKDIR_COMMAND = mkdir
     RM_COMMAND = rmdir /s /q
 else
     CLEAR_COMMAND = @clear
     COPY_COMMAND = cp
-    MKDIR_COMMAND = mkdir -p
     RM_COMMAND = rm -rf
 endif
 
 # Rust library path
-RUST_VM_PATH = ./rust_vm
-RUST_LIB_NAME = rust_vm.dll
-RUST_LIB_TARGET_DIR = $(RUST_VM_PATH)/target/release
+RUST_STACK_VM_LIB_NAME = rust_stack_vm
+RUST_STACK_VM_PATH = ./$(RUST_STACK_VM_LIB_NAME)
+RUST_STACK_VM_DLL_TARGET = $(RUST_STACK_VM_LIB_NAME).dll
+RUST_STACK_VM_LIB_TARGET_DIR = $(RUST_STACK_VM_LIB_NAME)/target/release
 
 # Go binary path
-GO_BIN_DIR = ./bin
-GO_BIN_NAME = hvm.exe
+GO_BIN_DIR = bin
+GO_BIN_NAME = hvm
 
 test:
 	@go test ./...
@@ -28,32 +27,22 @@ test-verbose:
 test-race:
 	@go test ./... --race
 
-build: rust-build go-build
-
 # Build rust library
 rust-build:
 	@echo "Building Rust library..."
-	@cd $(RUST_VM_PATH) && cargo build --release
+	@cd $(RUST_STACK_VM_PATH) && cargo build --release
 	@echo "Copying Rust library to project root..."
-	@$(MKDIR_COMMAND) $(GO_BIN_DIR)
-	@$(COPY_COMMAND) $(RUST_LIB_TARGET_DIR)\$(RUST_LIB_NAME) .
+	@if not exist $(GO_BIN_DIR) mkdir $(GO_BIN_DIR)
+	@copy "$(RUST_STACK_VM_LIB_TARGET_DIR)\$(RUST_STACK_VM_DLL_TARGET)" "./$(GO_BIN_DIR)"
+	@echo "Rust library builded & dll file copied"
 
 # Build go binary
 go-build:
 	@echo "Building Go binary..."
 	@go build -o $(GO_BIN_DIR)\$(GO_BIN_NAME)
+	@echo "Build go binary has been finished"
 
-#run: build
-#	@$(CLEAR_COMMAND)
-#	@$(GO_BIN_DIR)/$(GO_BIN_NAME)
+build: rust-build go-build
 
-run:
-	@CGO_ENABLED=$(CGO_ENABLED)
-	@go run main.go
-
-
-clean:
-	@echo "Cleaning build artifacts..."
-	@$(RM_COMMAND) $(GO_BIN_DIR)
-	@del $(RUST_LIB_NAME)
-	@cd $(RUST_VM_PATH) && cargo clean
+run: build
+	@$(GO_BIN_DIR)/$(GO_BIN_NAME)
