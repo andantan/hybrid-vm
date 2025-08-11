@@ -1,18 +1,28 @@
 mod vm;
 mod stack;
 
+use std::slice;
 use vm::executable::Executable;
 use vm::vm::VM;
-use vm::op::{OpCode, OpResult};
+use vm::op::{OpCode, COpCode, OpResult};
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn create_vm() -> *mut VM {
-    let instructions = vec![
-        OpCode::PUSH(-20000),
-        OpCode::PUSH(30000),
-        OpCode::ADD,
-        // Opcode::HALT,
-    ];
+pub unsafe extern "C" fn create_vm(
+    instruction_ptr: *const COpCode,
+    instruction_len: usize,
+) -> *mut VM {
+    let instruction_slice = unsafe {
+        slice::from_raw_parts(instruction_ptr, instruction_len)
+    };
+    
+    let instructions: Vec<OpCode> = instruction_slice.iter().map(|opcode| {
+        match opcode.kind {
+            0 => OpCode::PUSH(opcode.val),
+            1 => OpCode::ADD,
+            2 => OpCode::HALT,
+            _ => panic!("알 수 없는 Opcode"),
+        }
+    }).collect();
 
     let vm = VM::new(instructions);
 

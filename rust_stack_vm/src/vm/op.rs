@@ -1,11 +1,18 @@
 use std::ffi::c_int;
 
 #[repr(C)]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum OpCode {
     PUSH(c_int),
     ADD,
     HALT,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct COpCode {
+    pub kind: i32,
+    pub val: i32,
 }
 
 #[repr(C)]

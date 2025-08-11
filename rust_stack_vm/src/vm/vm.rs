@@ -32,10 +32,7 @@ impl Executable for VM {
 
             match opcode {
                 OpCode::PUSH(v) => {
-                    match self.stack.push(*v) {
-                        Ok(_) => (),
-                        Err(e) => return Err(e),
-                    };
+                    self.stack.push(*v)?;
                 },
                 OpCode::ADD => {
                     let a = self.stack.pop()?;
@@ -47,6 +44,8 @@ impl Executable for VM {
                     return Ok(self.stack.pop()? as c_int);
                 }
             }
+
+            println!("{:?}", self.stack);
         }
     }
 }

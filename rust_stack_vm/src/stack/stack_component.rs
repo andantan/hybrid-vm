@@ -1,3 +1,6 @@
+use std::fmt::{self, Debug, Formatter};
+use std::any::type_name;
+
 #[derive(Debug, PartialEq)]
 pub enum StackError {
     StackUnderFlow,
@@ -29,6 +32,26 @@ impl<T> StackComponent<T> {
         }
     }
 }
+
+impl<T: Debug> Debug for StackComponent<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let type_name = type_name::<T>();
+        let struct_name = format!("StackComponent<{}>", type_name);
+
+        let mut debug_struct = f.debug_struct(&struct_name);
+
+        if !self.data.is_empty() {
+            debug_struct.field("data", &self.data);
+        }
+
+        if !self.chunk_data.is_empty() {
+            debug_struct.field("chunk_data", &self.chunk_data);
+        }
+
+        debug_struct.finish()
+    }
+}
+
 
 impl<T> Stack<T> for StackComponent<T> {
     fn push(&mut self, value: T) -> Result<(), StackError> {
