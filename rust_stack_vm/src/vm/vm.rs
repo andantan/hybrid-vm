@@ -20,6 +20,11 @@ impl VM {
     }
 }
 
+impl Drop for VM {
+    fn drop(&mut self) {
+        println!("VM memory has been deallocated.");
+    }
+}
 impl Executable for VM {
     fn run(&mut self) -> Result<c_int, StackError> {
         loop {

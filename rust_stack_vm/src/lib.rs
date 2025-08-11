@@ -4,7 +4,7 @@ mod stack;
 use std::slice;
 use vm::executable::Executable;
 use vm::vm::VM;
-use vm::op::{OpCode, COpCode, OpResult};
+use vm::op::{OpCode, COpCode, COpResult};
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn create_vm(
@@ -20,7 +20,7 @@ pub unsafe extern "C" fn create_vm(
             0 => OpCode::PUSH(opcode.val),
             1 => OpCode::ADD,
             2 => OpCode::HALT,
-            _ => panic!("알 수 없는 Opcode"),
+            _ => panic!("Unknown opcode: {}", opcode.kind),
         }
     }).collect();
 
@@ -30,14 +30,14 @@ pub unsafe extern "C" fn create_vm(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn run_vm(vm_ptr: *mut VM) -> OpResult {
+pub unsafe extern "C" fn run_vm(vm_ptr: *mut VM) -> COpResult {
     let vm = unsafe {
         &mut *vm_ptr
     };
 
     match vm.run() {
-        Ok(v) => OpResult::ok(v),
-        Err(_) => OpResult::err(-1)
+        Ok(v) => COpResult::ok(v),
+        Err(_) => COpResult::err(-1)
     }
 }
 

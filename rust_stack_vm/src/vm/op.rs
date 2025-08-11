@@ -17,25 +17,25 @@ pub struct COpCode {
 
 #[repr(C)]
 #[derive(Debug)]
-pub struct OpResult {
-    result_code: c_int,
+pub struct COpResult {
+    result: c_int,
     is_error: bool,
 }
 
-impl OpResult {
-    pub fn new(result_code: c_int, is_error: bool) -> OpResult {
-        OpResult {
-            result_code,
+impl COpResult {
+    pub fn new(result: c_int, is_error: bool) -> COpResult {
+        COpResult {
+            result,
             is_error,
         }
     }
     
-    pub fn ok(result_code: c_int) -> OpResult {
-        OpResult::new(result_code, false)
+    pub fn ok(result_code: c_int) -> COpResult {
+        COpResult::new(result_code, false)
     }
     
-    pub fn err(result_code: c_int) -> OpResult {
-        OpResult::new(result_code, true)
+    pub fn err(result_code: c_int) -> COpResult {
+        COpResult::new(result_code, true)
     }
 }
 

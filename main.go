@@ -8,40 +8,31 @@ import "C"
 
 import (
 	"fmt"
-	"os"
-	"unsafe"
+	"github.com/andantan/hybrid-vm/ffi"
+	"github.com/andantan/hybrid-vm/vm"
 )
 
-type Opcode struct {
-	kind int32
-	val  int32
-}
-
 func main() {
-	instructions := []Opcode{
-		{kind: C.PUSH, val: 1},
-		{kind: C.PUSH, val: 3},
-		{kind: C.ADD, val: 0},
-		{kind: C.HALT, val: 0},
+	instructions := vm.NewInstructions()
+
+	instructions.Push(vm.OpPush(-100))
+	instructions.Push(vm.OpPush(55))
+	instructions.Push(vm.OpAdd())
+	instructions.Push(vm.OpHalt())
+
+	stackVm, err := vm.NewVM(instructions)
+
+	if err != nil {
+		panic(err)
 	}
 
-	instructionPtr := unsafe.Pointer(&instructions[0])
-	instructionLen := C.size_t(len(instructions))
+	opResult := ffi.RunVM(stackVm.Ptr)
 
-	vmPtr := C.create_vm((*C.C_OpCode)(instructionPtr), instructionLen)
-
-	if vmPtr == nil {
-		fmt.Println("Error: Failed to create VM")
-		os.Exit(1)
-	}
-
-	result := C.run_vm(vmPtr)
-
-	if result.is_error {
+	if opResult.IsError {
 		fmt.Println("Error occurred during VM execution")
 	} else {
-		fmt.Printf("VM execution successful. Result: %d\n", int32(result.result_code))
+		fmt.Printf("VM execution successful. Result: %d\n", opResult.Result)
 	}
 
-	C.free_vm(vmPtr)
+	ffi.FreeVm(stackVm.Ptr)
 }
