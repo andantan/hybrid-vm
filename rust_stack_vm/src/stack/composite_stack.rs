@@ -1,10 +1,12 @@
-use crate::stack::stack_component::StackComponent;
+use crate::stack::stack::StackComponent;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum StackValue {
     Integer(i32),
     Float(f32),
     Byte(u8),
+    // ByteArray is container that include image, data, address,
+    // hash, Non UTF-8 encoding (EUC-KR) etc...
     ByteArray(Vec<u8>),
 }
 
@@ -14,7 +16,7 @@ pub type CompositeStack = StackComponent<StackValue>;
 mod tests {
     use crate::stack::composite_stack::{CompositeStack};
     use crate::stack::composite_stack::StackValue::Integer;
-    use crate::stack::stack_component::{Stack, StackError};
+    use crate::stack::stack::{Stack, StackError};
 
     #[test]
     fn test_composite_byte_stack_basic() {

@@ -1,2 +1,2 @@
-pub mod stack_component;
+pub mod stack;
 pub mod composite_stack;

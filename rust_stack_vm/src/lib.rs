@@ -1,13 +1,12 @@
 mod vm;
 mod stack;
 
-use std::ffi::{c_float, c_uchar};
 use std::slice;
 use vm::vm::VM;
 use vm::op::{OpCode, Operation};
-use stack::stack_component::StackError;
+use stack::stack::StackError;
 use crate::stack::composite_stack::StackValue;
-use crate::vm::op::VMResult;
+use crate::vm::result::VMResult;
 use crate::vm::vm::VirtualMachine;
 
 #[unsafe(no_mangle)]
@@ -26,6 +25,7 @@ pub unsafe extern "C" fn create_vm(
             1 => OpCode::PUSHINT( unsafe { opcode.val.int_val } ),
             2 => OpCode::PUSHFLOAT( unsafe { opcode.val.float_val } ),
             3 => OpCode::PUSHBYTE( unsafe { opcode.val.byte_val } ),
+            //4 => OpCode::PACK( unsafe { opcode.val.int_val as usize } )
             4 => OpCode::POP,
             5 => OpCode::ADD,
             6 => OpCode::SUB,

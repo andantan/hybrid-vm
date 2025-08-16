@@ -1,6 +1,6 @@
 use crate::vm::op::OpCode;
 use crate::stack::composite_stack::{CompositeStack, StackValue};
-use crate::stack::stack_component::{Stack, StackError};
+use crate::stack::stack::{Stack, StackError};
 
 pub trait VirtualMachine {
     fn execute(&mut self) -> Result<StackValue, StackError>;

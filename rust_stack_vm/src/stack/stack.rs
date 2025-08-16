@@ -15,22 +15,22 @@ pub trait Stack<T> {
     fn pop_n(&mut self, n: usize) -> Result<Vec<T>, StackError>;
 }
 
-pub trait ChunkStack<T> {
-    fn push_chunk(&mut self, value: Box<[T]>) -> Result<(), StackError>;
-    fn pop_chunk(&mut self) -> Result<Box<[T]>, StackError>;
-    fn pop_n_chunk(&mut self, n: usize) -> Result<Vec<Box<[T]>>, StackError>;
+pub trait FrameStack<T> {
+    fn push_frame(&mut self, value: Box<[T]>) -> Result<(), StackError>;
+    fn pop_frame(&mut self) -> Result<Box<[T]>, StackError>;
+    fn pop_n_frame(&mut self, n: usize) -> Result<Vec<Box<[T]>>, StackError>;
 }
 
 pub struct StackComponent<T> {
     data: Vec<T>,
-    chunk_data: Vec<Box<[T]>>,
+    frames: Vec<Box<[T]>>,
 }
 
 impl<T> StackComponent<T> {
     pub fn new(size: usize) -> Self {
         StackComponent {
             data: Vec::with_capacity(size),
-            chunk_data: Vec::with_capacity(size),
+            frames: Vec::with_capacity(size),
         }
     }
 }
@@ -46,8 +46,8 @@ impl<T: Debug> Debug for StackComponent<T> {
             debug_struct.field("data", &self.data);
         }
 
-        if !self.chunk_data.is_empty() {
-            debug_struct.field("chunk_data", &self.chunk_data);
+        if !self.frames.is_empty() {
+            debug_struct.field("frames", &self.frames);
         }
 
         debug_struct.finish()
@@ -85,30 +85,30 @@ impl<T> Stack<T> for StackComponent<T> {
     }
 }
 
-impl<T> ChunkStack<T> for StackComponent<T> {
-    fn push_chunk(&mut self, value: Box<[T]>) -> Result<(), StackError> {
-        if self.chunk_data.len() == self.chunk_data.capacity() {
+impl<T> FrameStack<T> for StackComponent<T> {
+    fn push_frame(&mut self, value: Box<[T]>) -> Result<(), StackError> {
+        if self.frames.len() == self.frames.capacity() {
             return Err(StackError::StackOverFlow);
         }
 
-        self.chunk_data.push(value);
+        self.frames.push(value);
 
         Ok(())
     }
 
-    fn pop_chunk(&mut self) -> Result<Box<[T]>, StackError> {
-        match self.chunk_data.pop() {
+    fn pop_frame(&mut self) -> Result<Box<[T]>, StackError> {
+        match self.frames.pop() {
             Some(v) => Ok(v),
             None => Err(StackError::StackUnderFlow),
         }
     }
 
-    fn pop_n_chunk(&mut self, n: usize) -> Result<Vec<Box<[T]>>, StackError> {
+    fn pop_n_frame(&mut self, n: usize) -> Result<Vec<Box<[T]>>, StackError> {
         if self.data.len() < n {
             return Err(StackError::StackUnderFlow)
         }
 
-        let mut chunks: Vec<Box<[T]>> = self.chunk_data.drain(self.data.len() - n..).collect();
+        let mut chunks: Vec<Box<[T]>> = self.frames.drain(self.data.len() - n..).collect();
         chunks.reverse();
 
         Ok(chunks)
