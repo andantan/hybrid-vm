@@ -18,15 +18,6 @@ RUST_STACK_VM_LIB_TARGET_DIR = $(RUST_STACK_VM_LIB_NAME)/target/release
 GO_BIN_DIR = bin
 GO_BIN_NAME = hvm
 
-test:
-	@go test ./...
-
-test-verbose:
-	@go test -v ./...
-
-test-race:
-	@go test ./... --race
-
 # Build rust library
 rust-build:
 	@echo "Building Rust library..."
@@ -42,7 +33,18 @@ go-build:
 	@go build -o $(GO_BIN_DIR)\$(GO_BIN_NAME)
 	@echo "Build go binary has been finished"
 
+test:
+	@cd $(RUST_STACK_VM_PATH) && cargo test
+	@go test ./...
+
 build: rust-build go-build
 
 run: build
+	@$(CLEAR_COMMAND)
 	@$(GO_BIN_DIR)/$(GO_BIN_NAME)
+
+clean:
+	@echo "Cleaning up build artifacts..."
+	@if exist $(GO_BIN_DIR) $(RM_COMMAND) $(GO_BIN_DIR)
+	@cd $(RUST_STACK_VM_PATH) && cargo clean
+	@echo "Cleanup finished."

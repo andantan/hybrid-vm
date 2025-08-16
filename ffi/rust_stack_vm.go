@@ -11,11 +11,14 @@ import (
 	"unsafe"
 )
 
-func CreateVM(insts []COpCode) (VmPtr, error) {
-	cInstPtr := (*C.C_OpCode)(unsafe.Pointer(&insts[0]))
+type VmPtr unsafe.Pointer
+
+func CreateVM(stackSize int, insts []Operation) (VmPtr, error) {
+	cStackSize := C.size_t(stackSize)
+	cInstPtr := (*C.Operation)(unsafe.Pointer(&insts[0]))
 	instLen := C.size_t(len(insts))
 
-	vmPtr := C.create_vm(cInstPtr, instLen)
+	vmPtr := C.create_vm(cStackSize, cInstPtr, instLen)
 
 	if vmPtr == nil {
 		return nil, fmt.Errorf("failed to create VM in Rust")
@@ -24,10 +27,10 @@ func CreateVM(insts []COpCode) (VmPtr, error) {
 	return VmPtr(vmPtr), nil
 }
 
-func RunVM(vmPtr VmPtr) OpResult {
-	cOpResult := C.run_vm(unsafe.Pointer(vmPtr))
+func RunVM(vmPtr VmPtr) Result {
+	VMResult := C.run_vm(unsafe.Pointer(vmPtr))
 
-	return NewOpResult(cOpResult)
+	return NewResult(VMResult)
 }
 
 func FreeVm(vmPtr VmPtr) {

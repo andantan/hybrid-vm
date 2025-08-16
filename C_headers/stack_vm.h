@@ -6,8 +6,8 @@
 #include "./stack_vm_op.h"
 #include "./stack_vm_result.h"
 
-extern void* create_vm(C_OpCode* instruction_ptr, size_t instruction_len);
-extern OpResult run_vm(void* vm_ptr);
+extern void* create_vm(size_t stack_size, Operation* instruction_ptr, size_t instruction_len);
+extern VMResult run_vm(void* vm_ptr);
 extern void free_vm(void* vm_ptr);
 
 #endif // STACK_VM_H

@@ -8,31 +8,51 @@ import "C"
 
 import (
 	"fmt"
-	"github.com/andantan/hybrid-vm/ffi"
 	"github.com/andantan/hybrid-vm/vm"
 )
 
 func main() {
 	instructions := vm.NewInstructions()
 
-	instructions.Push(vm.OpPush(-100))
-	instructions.Push(vm.OpPush(55))
+	instructions.Push(vm.OpPushInt(-100))
+	instructions.Push(vm.OpPushFloat(55.2))
 	instructions.Push(vm.OpAdd())
+
+	instructions.Push(vm.OpPushInt(100))
+	instructions.Push(vm.OpPushFloat(-22.889))
+	instructions.Push(vm.OpSub())
+
+	instructions.Push(vm.OpAdd())
+
+	instructions.Push(vm.OpPushFloat(10.3))
+	instructions.Push(vm.OpMul())
+
+	instructions.Push(vm.OpPushInt(-300000000))
+	instructions.Push(vm.OpDiv())
+
+	instructions.Push(vm.OpPushFloat(70.8))
+	instructions.Push(vm.OpPushFloat(-88.188932))
+	instructions.Push(vm.OpPushFloat(205.185))
+	instructions.Push(vm.OpPushFloat(142.354))
+
+	instructions.Push(vm.OpAdd())
+	instructions.Push(vm.OpMul())
+	instructions.Push(vm.OpDiv())
+	instructions.Push(vm.OpSub())
+
 	instructions.Push(vm.OpHalt())
 
-	stackVm, err := vm.NewVM(instructions)
+	hvm, err := vm.NewVM(1<<10, instructions)
 
 	if err != nil {
 		panic(err)
 	}
 
-	opResult := ffi.RunVM(stackVm.Ptr)
+	result, err := hvm.Run()
 
-	if opResult.IsError {
-		fmt.Println("Error occurred during VM execution")
+	if err != nil {
+		fmt.Printf("vm error: %s\n", err)
 	} else {
-		fmt.Printf("VM execution successful. Result: %d\n", opResult.Result)
+		fmt.Printf("VM execution successful. Result: %+v\n", result)
 	}
-
-	ffi.FreeVm(stackVm.Ptr)
 }

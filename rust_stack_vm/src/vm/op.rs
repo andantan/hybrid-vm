@@ -1,41 +1,88 @@
-use std::ffi::c_int;
+use std::ffi::{c_float, c_int, c_uchar};
 
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub enum OpCode {
-    PUSH(c_int),
+    PUSHINT(c_int),
+    PUSHFLOAT(c_float),
+    PUSHBYTE(c_uchar),
+    POP,
     ADD,
+    SUB,
+    MUL,
+    DIV,
+    EQ,
+    LT,
+    LTE,
+    GT,
+    GTE,
     HALT,
 }
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-pub struct COpCode {
-    pub kind: i32,
-    pub val: i32,
+pub union OperationValue {
+    pub int_val: c_int,
+    pub float_val: c_float,
+    pub byte_val: c_uchar,
 }
 
 #[repr(C)]
-#[derive(Debug)]
-pub struct COpResult {
-    result: c_int,
-    is_error: bool,
+#[derive(Clone, Copy)]
+pub struct Operation {
+    pub kind: u8,
+    pub val: OperationValue,
 }
 
-impl COpResult {
-    pub fn new(result: c_int, is_error: bool) -> COpResult {
-        COpResult {
-            result,
-            is_error,
+#[repr(C)]
+pub enum VMResultTag {
+    Integer,
+    Float,
+    Error,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub union VMResultValue {
+    pub int_val: c_int,
+    pub float_val: c_float,
+}
+
+#[repr(C)]
+pub struct VMResult {
+    pub tag: VMResultTag,
+    pub value: VMResultValue,
+}
+
+impl VMResult {
+    pub fn new(tag: VMResultTag, value: VMResultValue) -> Self {
+        Self { tag, value }
+    }
+
+    pub fn ok_int(value: c_int) -> Self {
+        Self {
+            tag: VMResultTag::Integer,
+            value: VMResultValue {
+                int_val: value
+            },
         }
     }
-    
-    pub fn ok(result_code: c_int) -> COpResult {
-        COpResult::new(result_code, false)
+
+    pub fn ok_float(value: c_float) -> Self {
+        Self {
+            tag: VMResultTag::Float,
+            value: VMResultValue {
+                float_val: value
+            },
+        }
     }
-    
-    pub fn err(result_code: c_int) -> COpResult {
-        COpResult::new(result_code, true)
+
+    pub fn err(value: c_int) -> Self {
+        Self {
+            tag: VMResultTag::Error,
+            value: VMResultValue {
+                int_val: value
+            }
+        }
     }
 }
-

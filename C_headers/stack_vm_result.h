@@ -4,9 +4,20 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+typedef enum {
+    VM_RESULT_INTEGER,
+    VM_RESULT_FLOAT,
+    VM_RESULT_ERROR,
+} VMResultTag;
+
+typedef union {
+    int32_t int_val;
+    float float_val;
+} VMResultValue;
+
 typedef struct {
-    int32_t result;
-    bool is_error;
-} OpResult;
+    VMResultTag tag;
+    VMResultValue value;
+} VMResult;
 
 #endif // STACK_VM_RESULT

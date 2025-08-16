@@ -5,6 +5,8 @@ use std::any::type_name;
 pub enum StackError {
     StackUnderFlow,
     StackOverFlow,
+    StackInvalidType,
+    DivisionByZero
 }
 
 pub trait Stack<T> {
