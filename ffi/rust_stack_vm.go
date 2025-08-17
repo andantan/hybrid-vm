@@ -17,7 +17,6 @@ func CreateVM(stackSize int, insts []Operation) (VmPtr, error) {
 	cStackSize := C.size_t(stackSize)
 	cInstPtr := (*C.Operation)(unsafe.Pointer(&insts[0]))
 	instLen := C.size_t(len(insts))
-
 	vmPtr := C.create_vm(cStackSize, cInstPtr, instLen)
 
 	if vmPtr == nil {

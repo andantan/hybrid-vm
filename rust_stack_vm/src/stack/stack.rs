@@ -12,13 +12,13 @@ pub enum StackError {
 pub trait Stack<T> {
     fn push(&mut self, value: T) -> Result<(), StackError>;
     fn pop(&mut self) -> Result<T, StackError>;
-    fn pop_n(&mut self, n: usize) -> Result<Vec<T>, StackError>;
+    fn pop_n(&mut self, n: usize, rev: bool) -> Result<Vec<T>, StackError>;
 }
 
 pub trait FrameStack<T> {
     fn push_frame(&mut self, value: Box<[T]>) -> Result<(), StackError>;
     fn pop_frame(&mut self) -> Result<Box<[T]>, StackError>;
-    fn pop_n_frame(&mut self, n: usize) -> Result<Vec<Box<[T]>>, StackError>;
+    fn pop_n_frame(&mut self, n: usize, rev: bool) -> Result<Vec<Box<[T]>>, StackError>;
 }
 
 pub struct StackComponent<T> {
@@ -73,13 +73,16 @@ impl<T> Stack<T> for StackComponent<T> {
         }
     }
 
-    fn pop_n(&mut self, n: usize) -> Result<Vec<T>, StackError> {
+    fn pop_n(&mut self, n: usize, rev: bool) -> Result<Vec<T>, StackError> {
         if self.data.len() < n {
             return Err(StackError::StackUnderFlow)
         }
 
         let mut chunks: Vec<T> = self.data.drain(self.data.len() - n..).collect();
-        chunks.reverse();
+
+        if rev {
+            chunks.reverse();
+        }
 
         Ok(chunks)
     }
@@ -103,13 +106,16 @@ impl<T> FrameStack<T> for StackComponent<T> {
         }
     }
 
-    fn pop_n_frame(&mut self, n: usize) -> Result<Vec<Box<[T]>>, StackError> {
+    fn pop_n_frame(&mut self, n: usize, rev: bool) -> Result<Vec<Box<[T]>>, StackError> {
         if self.data.len() < n {
             return Err(StackError::StackUnderFlow)
         }
 
         let mut chunks: Vec<Box<[T]>> = self.frames.drain(self.data.len() - n..).collect();
-        chunks.reverse();
+
+        if rev {
+            chunks.reverse();
+        }
 
         Ok(chunks)
     }

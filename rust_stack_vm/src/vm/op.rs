@@ -3,18 +3,17 @@ pub enum OpCode {
     PUSHINT(i32),
     PUSHFLOAT(f32),
     PUSHBYTE(u8),
-    // TODO: PACK operation
-    // PACK(usize),
+    PACK(u32),
     POP,
     ADD,
     SUB,
     MUL,
     DIV,
     EQ,
-    LT,
-    LTE,
     GT,
     GTE,
+    LT,
+    LTE,
     HALT,
 }
 
@@ -22,6 +21,7 @@ pub enum OpCode {
 #[derive(Clone, Copy)]
 pub union OperationValue {
     pub int_val: i32,
+    pub uint_val: u32,
     pub float_val: f32,
     pub byte_val: u8,
 }

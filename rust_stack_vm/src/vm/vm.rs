@@ -53,6 +53,21 @@ impl VirtualMachine for VM {
                 OpCode::PUSHFLOAT(f) => {
                     self.stack.push(StackValue::Float(*f))?;
                 },
+                OpCode::PACK(u) => {
+                    let n = *u as usize;
+                    let vals = self.stack.pop_n(n, false)?;
+                    let byte_vec_result: Result<Vec<u8>, StackError> = vals.into_iter().map(|v| {
+                        if let StackValue::Byte(b) = v {
+                            Ok(b)
+                        } else {
+                            Err(StackError::StackInvalidType)
+                        }
+                    }).collect();
+
+                    let byte_vec = byte_vec_result?;
+
+                    self.stack.push(StackValue::ByteArray(byte_vec))?;
+                },
                 OpCode::POP => {
                     self.stack.pop()?;
                 },

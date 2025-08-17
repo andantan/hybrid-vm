@@ -2,7 +2,7 @@ package ffi
 
 /*
    #cgo LDFLAGS: -L${SRCDIR}/rust_stack_vm/target/release -lrust_stack_vm
-   #include "../C_headers/stack_vm_op.h"
+   #include "../C_headers/stack_vm.h"
 */
 import "C"
 import (
@@ -19,6 +19,7 @@ const (
 	OpCodePushInt   OperationCode = C.OP_PUSHINT
 	OpCodePushFloat OperationCode = C.OP_PUSHFLOAT
 	OpCodePushByte  OperationCode = C.OP_PUSHBYTE
+	OpCodePack      OperationCode = C.OP_PACK
 	OpCodePop       OperationCode = C.OP_POP
 	OpCodeAdd       OperationCode = C.OP_ADD
 	OpCodeSub       OperationCode = C.OP_SUB
@@ -38,6 +39,9 @@ func NewOperation(kind OperationCode, val any) Operation {
 	switch v := val.(type) {
 	case int32:
 		*(*C.int32_t)(unsafe.Pointer(&op.val)) = C.int32_t(v)
+
+	case uint32:
+		*(*C.uint32_t)(unsafe.Pointer(&op.val)) = C.uint32_t(v)
 
 	case float32:
 		*(*C.float)(unsafe.Pointer(&op.val)) = C.float(v)

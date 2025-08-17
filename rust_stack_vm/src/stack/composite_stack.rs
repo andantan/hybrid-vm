@@ -1,13 +1,34 @@
+use std::fmt::{Debug, Formatter};
 use crate::stack::stack::StackComponent;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum StackValue {
     Integer(i32),
     Float(f32),
     Byte(u8),
-    // ByteArray is container that include image, data, address,
+    // ByteArray is container that include string, data, address,
     // hash, Non UTF-8 encoding (EUC-KR) etc...
     ByteArray(Vec<u8>),
+}
+
+impl Debug for StackValue {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            StackValue::Integer(i) => write!(f, "Integer({:?})", i),
+            StackValue::Float(fl) => write!(f, "Float({:?})", fl),
+            StackValue::Byte(b) => write!(f, "Byte(0x{:02X})", b),
+            StackValue::ByteArray(bytes) => {
+                f.write_str("ByteArray([")?;
+                for (i, b) in bytes.iter().enumerate() {
+                    if i > 0 {
+                        f.write_str(", ")?;
+                    }
+                    write!(f, "0x{:02X}", b)?;
+                }
+                f.write_str("])")
+            }
+        }
+    }
 }
 
 pub type CompositeStack = StackComponent<StackValue>;
@@ -57,7 +78,7 @@ mod tests {
             assert_eq!(stack.push(Integer(i)), Ok(()));
         }
 
-        let popped = stack.pop_n(3);
+        let popped = stack.pop_n(3, true);
         assert_eq!(popped, Ok(vec![
             Integer(10),
             Integer(9),
@@ -68,7 +89,7 @@ mod tests {
         let mut stack_failure = CompositeStack::new(10);
         stack_failure.push(Integer(10)).unwrap();
 
-        let popped_failure = stack_failure.pop_n(3);
+        let popped_failure = stack_failure.pop_n(3, true);
         assert_eq!(popped_failure, Err(StackError::StackUnderFlow));
     }
 }

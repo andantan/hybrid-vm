@@ -14,33 +14,23 @@ import (
 func main() {
 	instructions := vm.NewInstructions()
 
-	instructions.Push(vm.OpPushInt(-100))
-	instructions.Push(vm.OpPushFloat(55.2))
-	instructions.Push(vm.OpAdd())
+	b1 := []byte{
+		0x00, 0x01, 0x02, 0x03,
+		0x04, 0x05, 0x06, 0x07,
+		0x08, 0x09, 0x0A, 0x0B,
+		0x0C, 0x0D, 0x0E, 0x0F,
+	}
 
-	instructions.Push(vm.OpPushInt(100))
-	instructions.Push(vm.OpPushFloat(-22.889))
-	instructions.Push(vm.OpSub())
+	b2 := []byte{
+		0x10, 0x11, 0x12, 0x13,
+		0x14, 0x15, 0x16, 0x17,
+		0x18, 0x19, 0x1A, 0x1B,
+		0x1C, 0x1D, 0x1E, 0x1F,
+	}
 
-	instructions.Push(vm.OpAdd())
-
-	instructions.Push(vm.OpPushFloat(10.3))
-	instructions.Push(vm.OpMul())
-
-	instructions.Push(vm.OpPushInt(-300000000))
-	instructions.Push(vm.OpDiv())
-
-	instructions.Push(vm.OpPushFloat(70.8))
-	instructions.Push(vm.OpPushFloat(-88.188932))
-	instructions.Push(vm.OpPushFloat(205.185))
-	instructions.Push(vm.OpPushFloat(142.354))
-
-	instructions.Push(vm.OpAdd())
-	instructions.Push(vm.OpMul())
-	instructions.Push(vm.OpDiv())
-	instructions.Push(vm.OpSub())
-
-	instructions.Push(vm.OpHalt())
+	instructions.PushBytesAndPack(b1)
+	instructions.PushBytesAndPack(b2)
+	instructions.Halt()
 
 	hvm, err := vm.NewVM(1<<10, instructions)
 

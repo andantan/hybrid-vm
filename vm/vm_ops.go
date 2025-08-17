@@ -1,126 +1,115 @@
 package vm
 
-import "github.com/andantan/hybrid-vm/ffi"
-
-type Instructions []OpCode
-
-func NewInstructions() Instructions {
-	return make(Instructions, 0)
-}
-
-func (ins *Instructions) Push(op OpCode) {
-	*ins = append(*ins, op)
-}
-
-func (ins *Instructions) ToOperationSlice() []ffi.Operation {
-	cInsts := make([]ffi.Operation, len(*ins))
-
-	for i, op := range *ins {
-		cInsts[i] = ffi.NewOperation(op.kind, op.val)
-	}
-
-	return cInsts
-}
+import (
+	"github.com/andantan/hybrid-vm/ffi"
+)
 
 type OpCode struct {
 	kind ffi.OperationCode
 	val  any
 }
 
-func OpHalt() OpCode {
+func NewOpHalt() OpCode {
 	return OpCode{
 		kind: ffi.OpCodeHalt,
 		val:  nil,
 	}
 }
 
-func OpPushInt(value int32) OpCode {
+func NewOpPushInt(value int32) OpCode {
 	return OpCode{
 		kind: ffi.OpCodePushInt,
 		val:  value,
 	}
 }
 
-func OpPushFloat(value float32) OpCode {
+func NewOpPushFloat(value float32) OpCode {
 	return OpCode{
 		kind: ffi.OpCodePushFloat,
 		val:  value,
 	}
 }
 
-func OpPushByte(value byte) OpCode {
+func NewOpPushByte(value byte) OpCode {
 	return OpCode{
 		kind: ffi.OpCodePushByte,
 		val:  int32(value),
 	}
 }
 
-func OpPop() OpCode {
+func NewOpPack(size uint32) OpCode {
+	return OpCode{
+		kind: ffi.OpCodePack,
+		val:  size,
+	}
+}
+
+func NewOpPop() OpCode {
 	return OpCode{
 		kind: ffi.OpCodePop,
 		val:  nil,
 	}
 }
 
-func OpAdd() OpCode {
+func NewOpAdd() OpCode {
 	return OpCode{
 		kind: ffi.OpCodeAdd,
 		val:  nil,
 	}
 }
 
-func OpSub() OpCode {
+func NewOpSub() OpCode {
 	return OpCode{
 		kind: ffi.OpCodeSub,
 		val:  nil,
 	}
 }
 
-func OpMul() OpCode {
+func NewOpMul() OpCode {
 	return OpCode{
 		kind: ffi.OpCodeMul,
 		val:  nil,
 	}
 }
 
-func OpDiv() OpCode {
+func NewOpDiv() OpCode {
 	return OpCode{
 		kind: ffi.OpCodeDiv,
 		val:  nil,
 	}
 }
 
-func OpEq() OpCode {
+func NewOpEq() OpCode {
 	return OpCode{
 		kind: ffi.OpCodeEq,
 		val:  nil,
 	}
 }
 
-func OpLt() OpCode {
-	return OpCode{
-		kind: ffi.OpCodeLt,
-		val:  nil,
-	}
-}
-
-func OpLte() OpCode {
-	return OpCode{
-		kind: ffi.OpCodeLte,
-		val:  nil,
-	}
-}
-
-func OpGt() OpCode {
+func NewOpGt() OpCode {
 	return OpCode{
 		kind: ffi.OpCodeGt,
 		val:  nil,
 	}
 }
 
-func OpGte() OpCode {
+func NewOpGte() OpCode {
 	return OpCode{
 		kind: ffi.OpCodeGte,
+		val:  nil,
+	}
+}
+
+func NewOpLt() OpCode {
+	return OpCode{
+		kind: ffi.OpCodeLt,
+		val:  nil,
+	}
+}
+
+func NewOpLte() OpCode {
+	return OpCode{
+		kind: ffi.OpCodeLte,
 		val:  nil,
 	}
 }

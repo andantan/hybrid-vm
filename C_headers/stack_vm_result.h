@@ -7,12 +7,20 @@
 typedef enum {
     VM_RESULT_INTEGER,
     VM_RESULT_FLOAT,
+    VM_RESULT_BYTE_ARRAY,
     VM_RESULT_ERROR,
 } VMResultTag;
 
+typedef struct {
+    uint8_t*  ptr;
+    size_t    len;
+    size_t    capacity;
+} ByteArrayPtr;
+
 typedef union {
-    int32_t int_val;
-    float float_val;
+    int32_t         int_val;
+    float           float_val;
+    ByteArrayPtr    byte_array_val;
 } VMResultValue;
 
 typedef struct {

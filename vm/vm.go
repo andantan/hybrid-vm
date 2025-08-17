@@ -19,7 +19,7 @@ func NewVM(stackSize int, inst Instructions) (*VM, error) {
 		return nil, fmt.Errorf("empty instructions")
 	}
 
-	cInsts := inst.ToOperationSlice()
+	cInsts := inst.ToFFIOperationSlice()
 	vmPtr, err := ffi.CreateVM(stackSize, cInsts)
 
 	if err != nil {
@@ -51,11 +51,19 @@ func (vm *VM) Run() (any, error) {
 		}
 	}
 
+	var v any
+
 	if result.IsFloat {
-		return result.FloatValue, nil
+		v = result.FloatValue
+	} else if result.IsByteArray {
+		v = result.ByteArrayValue[:]
+	} else {
+		v = result.IntValue
 	}
 
-	return result.IntValue, nil
+	defer result.Free()
+
+	return v, nil
 }
 
 func (vm *VM) Free() {

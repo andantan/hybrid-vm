@@ -21,21 +21,21 @@ pub unsafe extern "C" fn create_vm(
     
     let instructions: Vec<OpCode> = instruction_slice.iter().map(|opcode| {
         match opcode.kind {
-            0 => OpCode::HALT,
-            1 => OpCode::PUSHINT( unsafe { opcode.val.int_val } ),
-            2 => OpCode::PUSHFLOAT( unsafe { opcode.val.float_val } ),
-            3 => OpCode::PUSHBYTE( unsafe { opcode.val.byte_val } ),
-            //4 => OpCode::PACK( unsafe { opcode.val.int_val as usize } )
-            4 => OpCode::POP,
-            5 => OpCode::ADD,
-            6 => OpCode::SUB,
-            7 => OpCode::MUL,
-            8 => OpCode::DIV,
-            9 => OpCode::EQ,
-            10 => OpCode::LT,
-            11 => OpCode::LTE,
-            12 => OpCode::GT,
-            13 => OpCode::GTE,
+            0x00 => OpCode::HALT,
+            0x01 => OpCode::PUSHINT( unsafe { opcode.val.int_val } ),
+            0x02 => OpCode::PUSHFLOAT( unsafe { opcode.val.float_val } ),
+            0x03 => OpCode::PUSHBYTE( unsafe { opcode.val.byte_val } ),
+            0x04 => OpCode::PACK( unsafe { opcode.val.uint_val } ),
+            0x05 => OpCode::POP,
+            0x06 => OpCode::ADD,
+            0x07 => OpCode::SUB,
+            0x08 => OpCode::MUL,
+            0x09 => OpCode::DIV,
+            0x0A => OpCode::EQ,
+            0x0B => OpCode::GT,
+            0x0C => OpCode::GTE,
+            0x0D => OpCode::LT,
+            0x0E => OpCode::LTE,
             _ => panic!("Unknown opcode: {}", opcode.kind),
         }
     }).collect();
@@ -55,6 +55,7 @@ pub unsafe extern "C" fn run_vm(vm_ptr: *mut VM) -> VMResult {
         Ok(stack_value) => match stack_value {
             StackValue::Integer(i) => VMResult::ok_int(i),
             StackValue::Float(f) => VMResult::ok_float(f),
+            StackValue::ByteArray(vec) => VMResult::ok_byte_array(vec),
             _ => VMResult::err(-1)
         },
         Err(e) => {
@@ -69,10 +70,15 @@ pub unsafe extern "C" fn run_vm(vm_ptr: *mut VM) -> VMResult {
 }
 
 #[unsafe(no_mangle)]
+pub unsafe extern "C" fn free_byte_array(ptr: *mut u8, len: usize, capacity: usize) {
+    if !ptr.is_null() {
+        let _ = unsafe { Vec::from_raw_parts(ptr, len, capacity) };
+    }
+}
+
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn free_vm(vm_ptr: *mut VM) {
     if !vm_ptr.is_null() {
-        unsafe {
-            let _ = Box::from_raw(vm_ptr);
-        }
+        let _ = unsafe { Box::from_raw(vm_ptr) };
     }
 }
