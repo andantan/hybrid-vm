@@ -4,7 +4,9 @@ use std::ptr;
 pub enum VMResultTag {
     Integer,
     Float,
+    Byte,
     ByteArray,
+    Bool,
     Error,
 }
 
@@ -21,7 +23,9 @@ pub struct ByteArrayPtr {
 pub union VMResultValue {
     pub int_val: i32,
     pub float_val: f32,
+    pub byte_val: u8,
     pub bytes_array_val: ByteArrayPtr,
+    pub bool_val: bool,
 }
 
 #[repr(C)]
@@ -39,7 +43,7 @@ impl VMResult {
         Self {
             tag: VMResultTag::Integer,
             value: VMResultValue {
-                int_val: value
+                int_val: value,
             },
         }
     }
@@ -48,8 +52,17 @@ impl VMResult {
         Self {
             tag: VMResultTag::Float,
             value: VMResultValue {
-                float_val: value
+                float_val: value,
             },
+        }
+    }
+
+    pub fn ok_byte(value: u8) -> Self {
+        Self {
+            tag: VMResultTag::Byte,
+            value: VMResultValue {
+                byte_val: value,
+            }
         }
     }
 
@@ -67,6 +80,15 @@ impl VMResult {
             value: VMResultValue {
                 bytes_array_val: byte_array_ptr,
             },
+        }
+    }
+
+    pub fn ok_bool(value: bool) -> Self {
+        Self {
+            tag: VMResultTag::Bool,
+            value: VMResultValue {
+                bool_val: value,
+            }
         }
     }
 

@@ -36,6 +36,7 @@ pub unsafe extern "C" fn create_vm(
             0x0C => OpCode::GTE,
             0x0D => OpCode::LT,
             0x0E => OpCode::LTE,
+            0x0F => OpCode::CONCAT,
             _ => panic!("Unknown opcode: {}", opcode.kind),
         }
     }).collect();
@@ -55,8 +56,9 @@ pub unsafe extern "C" fn run_vm(vm_ptr: *mut VM) -> VMResult {
         Ok(stack_value) => match stack_value {
             StackValue::Integer(i) => VMResult::ok_int(i),
             StackValue::Float(f) => VMResult::ok_float(f),
+            StackValue::Byte(b) => VMResult::ok_byte(b),
             StackValue::ByteArray(vec) => VMResult::ok_byte_array(vec),
-            _ => VMResult::err(-1)
+            StackValue::Bool(b) => VMResult::ok_bool(b),
         },
         Err(e) => {
             match e {

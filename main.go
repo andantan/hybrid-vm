@@ -30,6 +30,13 @@ func main() {
 
 	instructions.PushBytesAndPack(b1)
 	instructions.PushBytesAndPack(b2)
+	instructions.PushOperation(vm.NewOpConcat())
+
+	instructions.PushOperation(vm.NewOpPushFloat(3.14))
+	instructions.PushOperation(vm.NewOpPushInt(5))
+	instructions.PushOperation(vm.NewOpLt())
+	instructions.PushOperation(vm.NewOpPushByte(0xFF))
+
 	instructions.Halt()
 
 	hvm, err := vm.NewVM(1<<10, instructions)
@@ -43,6 +50,6 @@ func main() {
 	if err != nil {
 		fmt.Printf("vm error: %s\n", err)
 	} else {
-		fmt.Printf("VM execution successful. Result: %+v\n", result)
+		fmt.Printf("VM execution successful. Result: %+v, Type: %T\n", result, result)
 	}
 }

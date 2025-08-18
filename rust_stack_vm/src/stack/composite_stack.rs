@@ -9,6 +9,7 @@ pub enum StackValue {
     // ByteArray is container that include string, data, address,
     // hash, Non UTF-8 encoding (EUC-KR) etc...
     ByteArray(Vec<u8>),
+    Bool(bool),
 }
 
 impl Debug for StackValue {
@@ -26,7 +27,8 @@ impl Debug for StackValue {
                     write!(f, "0x{:02X}", b)?;
                 }
                 f.write_str("])")
-            }
+            },
+            StackValue::Bool(b) => write!(f, "Bool({:?})", b),
         }
     }
 }

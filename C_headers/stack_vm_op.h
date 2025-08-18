@@ -16,6 +16,7 @@
 #define OP_GTE        0x0C
 #define OP_LT         0x0D
 #define OP_LTE        0x0E
+#define OP_CONCAT     0x0F
 
 #include <stdint.h>
 

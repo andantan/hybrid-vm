@@ -32,9 +32,14 @@ func NewVM(stackSize int, inst Instructions) (*VM, error) {
 }
 
 func (vm *VM) Run() (any, error) {
-	defer vm.Free()
+	var result ffi.Result
 
-	result := ffi.RunVM(vm.Ptr)
+	defer func() {
+		result.Free()
+		vm.Free()
+	}()
+
+	result = ffi.RunVM(vm.Ptr)
 
 	if result.IsError {
 		switch result.ErrorCode {
@@ -55,13 +60,17 @@ func (vm *VM) Run() (any, error) {
 
 	if result.IsFloat {
 		v = result.FloatValue
+	} else if result.IsByte {
+		v = result.ByteValue
 	} else if result.IsByteArray {
 		v = result.ByteArrayValue[:]
+	} else if result.IsBool {
+		v = result.BoolValue
 	} else {
 		v = result.IntValue
 	}
 
-	defer result.Free()
+	// defer result.Free()
 
 	return v, nil
 }

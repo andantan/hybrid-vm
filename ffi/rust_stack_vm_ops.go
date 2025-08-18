@@ -30,6 +30,7 @@ const (
 	OpCodeLte       OperationCode = C.OP_LTE
 	OpCodeGt        OperationCode = C.OP_GT
 	OpCodeGte       OperationCode = C.OP_GTE
+	OpCodeConcat    OperationCode = C.OP_CONCAT
 )
 
 func NewOperation(kind OperationCode, val any) Operation {

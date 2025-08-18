@@ -113,3 +113,10 @@ func NewOpLte() OpCode {
 		val:  nil,
 	}
 }
+
+func NewOpConcat() OpCode {
+	return OpCode{
+		kind: ffi.OpCodeConcat,
+		val:  nil,
+	}
+}

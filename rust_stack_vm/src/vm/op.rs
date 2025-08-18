@@ -15,6 +15,7 @@ pub enum OpCode {
     LT,
     LTE,
     HALT,
+    CONCAT,
 }
 
 #[repr(C)]

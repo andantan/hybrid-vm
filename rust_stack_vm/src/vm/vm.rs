@@ -72,25 +72,25 @@ impl VirtualMachine for VM {
                     self.stack.pop()?;
                 },
                 OpCode::ADD => {
-                    let v1 = self.stack.pop()?;
-                    let v2 = self.stack.pop()?;
+                    let rhs = self.stack.pop()?;
+                    let lhs = self.stack.pop()?;
 
-                    match (v1, v2) {
+                    match (lhs, rhs) {
                         // i32 + i32
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => {
-                            self.stack.push(StackValue::Integer(i1 + i2))?;
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => {
+                            self.stack.push(StackValue::Integer(lhs_i32 + rhs_i32))?;
                         },
                         // f32 + f32
-                        (StackValue::Float(f1), StackValue::Float(f2)) => {
-                            self.stack.push(StackValue::Float(f1 + f2))?;
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => {
+                            self.stack.push(StackValue::Float(lhs_f32 + rhs_f32))?;
                         },
                         // i32 + f32 = f32(i32) + f32
-                        (StackValue::Integer(i), StackValue::Float(f)) => {
-                            self.stack.push(StackValue::Float((i as f32) + f))?;
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => {
+                            self.stack.push(StackValue::Float((lhs_i32 as f32) + rhs_f32))?;
                         },
                         // f32 + i32 = f32 + f32(i32)
-                        (StackValue::Float(f), StackValue::Integer(i)) => {
-                            self.stack.push(StackValue::Float(f + (i as f32)))?;
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => {
+                            self.stack.push(StackValue::Float(lhs_f32 + (rhs_i32 as f32)))?;
                         }
                         _ => {
                             return Err(StackError::StackInvalidType);
@@ -98,25 +98,25 @@ impl VirtualMachine for VM {
                     }
                 },
                 OpCode::SUB => {
-                    let v1 = self.stack.pop()?;
-                    let v2 = self.stack.pop()?;
+                    let rhs = self.stack.pop()?;
+                    let lhs = self.stack.pop()?;
 
-                    match (v1, v2) {
+                    match (lhs, rhs) {
                         // i32 - i32
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => {
-                            self.stack.push(StackValue::Integer(i1 - i2))?;
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => {
+                            self.stack.push(StackValue::Integer(lhs_i32 - rhs_i32))?;
                         },
                         // f32 - f32
-                        (StackValue::Float(f1), StackValue::Float(f2)) => {
-                            self.stack.push(StackValue::Float(f1 - f2))?;
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => {
+                            self.stack.push(StackValue::Float(lhs_f32 - rhs_f32))?;
                         },
                         // i32 - f32 = f32(i32) - f32
-                        (StackValue::Integer(i), StackValue::Float(f)) => {
-                            self.stack.push(StackValue::Float((i as f32) - f))?;
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => {
+                            self.stack.push(StackValue::Float((lhs_i32 as f32) - rhs_f32))?;
                         },
                         // f32 - i32 = f32 - f32(i32)
-                        (StackValue::Float(f), StackValue::Integer(i)) => {
-                            self.stack.push(StackValue::Float(f - (i as f32)))?;
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => {
+                            self.stack.push(StackValue::Float(lhs_f32 - (rhs_i32 as f32)))?;
                         }
                         _ => {
                             return Err(StackError::StackInvalidType);
@@ -124,22 +124,25 @@ impl VirtualMachine for VM {
                     }
                 },
                 OpCode::MUL => {
-                    let v1 = self.stack.pop()?;
-                    let v2 = self.stack.pop()?;
+                    let rhs = self.stack.pop()?;
+                    let lhs = self.stack.pop()?;
 
-                    match (v1, v2) {
+                    match (lhs, rhs) {
                         // i32 * i32
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => {
-                            self.stack.push(StackValue::Integer(i1 * i2))?;
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => {
+                            self.stack.push(StackValue::Integer(lhs_i32 * rhs_i32))?;
                         },
                         // f32 * f32
-                        (StackValue::Float(f1), StackValue::Float(f2)) => {
-                            self.stack.push(StackValue::Float(f1 * f2))?;
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => {
+                            self.stack.push(StackValue::Float(lhs_f32 * rhs_f32))?;
                         },
                         // i32 * f32 = f32(i32) * f32
-                        (StackValue::Integer(i), StackValue::Float(f)) |
-                        (StackValue::Float(f), StackValue::Integer(i)) => {
-                            self.stack.push(StackValue::Float((i as f32) * f))?;
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => {
+                            self.stack.push(StackValue::Float((lhs_i32 as f32) * rhs_f32))?;
+                        },
+                        // f32 * i32 = f32 * f32(i32)
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => {
+                            self.stack.push(StackValue::Float(lhs_f32 * (rhs_i32 as f32)))?;
                         },
                         _ => {
                             return Err(StackError::StackInvalidType);
@@ -147,33 +150,33 @@ impl VirtualMachine for VM {
                     }
                 },
                 OpCode::DIV => {
-                    let v1 = self.stack.pop()?; // dividend
-                    let v2 = self.stack.pop()?; // divisor
+                    let rhs = self.stack.pop()?; // dividend
+                    let lhs = self.stack.pop()?; // divisor
 
-                    match (v1, v2) {
+                    match (lhs, rhs) {
                         // i32 / i32
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => {
-                            if i2 == 0 { return Err(StackError::DivisionByZero); }
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => {
+                            if rhs_i32 == 0 { return Err(StackError::DivisionByZero); }
 
-                            self.stack.push(StackValue::Integer(i1 / i2))?;
+                            self.stack.push(StackValue::Integer(lhs_i32 / rhs_i32))?;
                         },
                         // f32 / f32
-                        (StackValue::Float(f1), StackValue::Float(f2)) => {
-                            if f2 == 0.0 { return Err(StackError::DivisionByZero); }
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => {
+                            if rhs_f32 == 0.0 { return Err(StackError::DivisionByZero); }
 
-                            self.stack.push(StackValue::Float(f1 / f2))?;
+                            self.stack.push(StackValue::Float(lhs_f32 / rhs_f32))?;
                         },
-                        // f32 / i32
-                        (StackValue::Integer(i1), StackValue::Float(f2)) => {
-                            if f2 == 0.0 { return Err(StackError::DivisionByZero); }
+                        // i32 / f32 = f32(i32) / i32
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => {
+                            if rhs_f32 == 0.0 { return Err(StackError::DivisionByZero); }
 
-                            self.stack.push(StackValue::Float((i1 as f32) / f2))?;
+                            self.stack.push(StackValue::Float((lhs_i32 as f32) / rhs_f32))?;
                         },
-                        // i32 / f32
-                        (StackValue::Float(f1), StackValue::Integer(i2)) => {
-                            if i2 == 0 { return Err(StackError::DivisionByZero); }
+                        // f32 / i32 = f32 / f32(i32)
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => {
+                            if rhs_i32 == 0 { return Err(StackError::DivisionByZero); }
 
-                            self.stack.push(StackValue::Float(f1 / (i2 as f32)))?;
+                            self.stack.push(StackValue::Float(lhs_f32 / (rhs_i32 as f32)))?;
                         },
                         _ => {
                             return Err(StackError::StackInvalidType);
@@ -181,79 +184,91 @@ impl VirtualMachine for VM {
                     }
                 }
                 OpCode::EQ => {
-                    let v1 = self.stack.pop()?;
-                    let v2 = self.stack.pop()?;
+                    let rhs = self.stack.pop()?;
+                    let lhs = self.stack.pop()?;
 
-                    let result = match (v1, v2) {
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => i1 == i2,
-                        (StackValue::Byte(b1), StackValue::Byte(b2)) => b1 == b2,
-                        (StackValue::Float(f1), StackValue::Float(f2)) => f1 == f2,
-                        (StackValue::Integer(i), StackValue::Float(f)) |
-                        (StackValue::Float(f), StackValue::Integer(i)) => (i as f32) == f,
+                    let result = match (lhs, rhs) {
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => lhs_i32 == rhs_i32,
+                        (StackValue::Byte(lhs_u8), StackValue::Byte(rhs_u8)) => lhs_u8 == rhs_u8,
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => lhs_f32 == rhs_f32,
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => (lhs_i32 as f32) == rhs_f32,
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => lhs_f32 == (rhs_i32 as f32),
                         _ => return Err(StackError::StackInvalidType),
                     };
 
-                    self.stack.push(StackValue::Integer(if result { 1 } else { 0 }))?;
+                    self.stack.push(StackValue::Bool(result))?;
                 },
                 OpCode::LT => {
-                    let v1 = self.stack.pop()?;
-                    let v2 = self.stack.pop()?;
+                    let rhs = self.stack.pop()?;
+                    let lhs = self.stack.pop()?;
 
-                    let result = match (v1, v2) {
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => i1 < i2,
-                        (StackValue::Byte(b1), StackValue::Byte(b2)) => b1 < b2,
-                        (StackValue::Float(f1), StackValue::Float(f2)) => f1 < f2,
-                        (StackValue::Integer(i), StackValue::Float(f)) |
-                        (StackValue::Float(f), StackValue::Integer(i)) => (i as f32) < f,
+                    let result = match (lhs, rhs) {
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => lhs_i32 < rhs_i32,
+                        (StackValue::Byte(lhs_u8), StackValue::Byte(rhs_u8)) => lhs_u8 < rhs_u8,
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => lhs_f32 < rhs_f32,
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => (lhs_i32 as f32) < rhs_f32,
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => lhs_f32 < (rhs_i32 as f32),
                         _ => return Err(StackError::StackInvalidType),
                     };
 
-                    self.stack.push(StackValue::Integer(if result { 1 } else { 0 }))?;
+                    self.stack.push(StackValue::Bool(result))?;
                 },
                 OpCode::LTE => {
-                    let v1 = self.stack.pop()?;
-                    let v2 = self.stack.pop()?;
+                    let rhs = self.stack.pop()?;
+                    let lhs = self.stack.pop()?;
 
-                    let result = match (v1, v2) {
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => i1 <= i2,
-                        (StackValue::Byte(b1), StackValue::Byte(b2)) => b1 <= b2,
-                        (StackValue::Float(f1), StackValue::Float(f2)) => f1 <= f2,
-                        (StackValue::Integer(i), StackValue::Float(f)) |
-                        (StackValue::Float(f), StackValue::Integer(i)) => (i as f32) <= f,
+                    let result = match (lhs, rhs) {
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => lhs_i32 <= rhs_i32,
+                        (StackValue::Byte(lhs_u8), StackValue::Byte(rhs_u8)) => lhs_u8 <= rhs_u8,
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => lhs_f32 <= rhs_f32,
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => (lhs_i32 as f32) <= rhs_f32,
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => lhs_f32 <= (rhs_i32 as f32),
                         _ => return Err(StackError::StackInvalidType),
                     };
 
-                    self.stack.push(StackValue::Integer(if result { 1 } else { 0 }))?;
+                    self.stack.push(StackValue::Bool(result))?;
                 },
                 OpCode::GT => {
-                    let v1 = self.stack.pop()?;
-                    let v2 = self.stack.pop()?;
+                    let rhs = self.stack.pop()?;
+                    let lhs = self.stack.pop()?;
 
-                    let result = match (v1, v2) {
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => i1 > i2,
-                        (StackValue::Byte(b1), StackValue::Byte(b2)) => b1 > b2,
-                        (StackValue::Float(f1), StackValue::Float(f2)) => f1 > f2,
-                        (StackValue::Integer(i), StackValue::Float(f)) |
-                        (StackValue::Float(f), StackValue::Integer(i)) => (i as f32) > f,
+                    let result = match (lhs, rhs) {
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => lhs_i32 > rhs_i32,
+                        (StackValue::Byte(lhs_u8), StackValue::Byte(rhs_u8)) => lhs_u8 > rhs_u8,
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => lhs_f32 > rhs_f32,
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => (lhs_i32 as f32) > rhs_f32,
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => lhs_f32 > (rhs_i32 as f32),
                         _ => return Err(StackError::StackInvalidType),
                     };
 
-                    self.stack.push(StackValue::Integer(if result { 1 } else { 0 }))?;
+                    self.stack.push(StackValue::Bool(result))?;
                 },
                 OpCode::GTE => {
-                    let v1 = self.stack.pop()?;
-                    let v2 = self.stack.pop()?;
+                    let rhs = self.stack.pop()?;
+                    let lhs = self.stack.pop()?;
 
-                    let result = match (v1, v2) {
-                        (StackValue::Integer(i1), StackValue::Integer(i2)) => i1 >= i2,
-                        (StackValue::Byte(b1), StackValue::Byte(b2)) => b1 >= b2,
-                        (StackValue::Float(f1), StackValue::Float(f2)) => f1 >= f2,
-                        (StackValue::Integer(i), StackValue::Float(f)) |
-                        (StackValue::Float(f), StackValue::Integer(i)) => (i as f32) >= f,
+                    let result = match (lhs, rhs) {
+                        (StackValue::Integer(lhs_i32), StackValue::Integer(rhs_i32)) => lhs_i32 >= rhs_i32,
+                        (StackValue::Byte(lhs_u8), StackValue::Byte(rhs_u8)) => lhs_u8 >= rhs_u8,
+                        (StackValue::Float(lhs_f32), StackValue::Float(rhs_f32)) => lhs_f32 >= rhs_f32,
+                        (StackValue::Integer(lhs_i32), StackValue::Float(rhs_f32)) => (lhs_i32 as f32) >= rhs_f32,
+                        (StackValue::Float(lhs_f32), StackValue::Integer(rhs_i32)) => lhs_f32 >= (rhs_i32 as f32),
                         _ => return Err(StackError::StackInvalidType),
                     };
 
-                    self.stack.push(StackValue::Integer(if result { 1 } else { 0 }))?;
+                    self.stack.push(StackValue::Bool(result))?;
+                },
+                OpCode::CONCAT => {
+                    let v1 = self.stack.pop()?;
+                    let v2 = self.stack.pop()?;
+
+                    if let (StackValue::ByteArray(bytes1), StackValue::ByteArray(mut bytes2)) = (v1, v2) {
+                        bytes2.extend_from_slice(&bytes1);
+
+                        self.stack.push(StackValue::ByteArray(bytes2))?;
+                    } else {
+                        return Err(StackError::StackInvalidType);
+                    }
                 }
             }
 
